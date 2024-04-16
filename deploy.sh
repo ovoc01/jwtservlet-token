@@ -1,0 +1,1 @@
+cp ./target/jwt-servlet-1.0-SNAPSHOT.war /Users/dev/utils/server/tomcat-10/webapps/

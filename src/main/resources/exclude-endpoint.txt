@@ -1,0 +1,1 @@
+GET:/,GET:/login,GET:/hello-servlet
