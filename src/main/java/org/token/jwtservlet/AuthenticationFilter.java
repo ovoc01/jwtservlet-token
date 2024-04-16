@@ -8,8 +8,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 import java.util.HashMap;
 
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.ECDSAKeyProvider;
 import com.google.gson.Gson;
 
 import jakarta.servlet.Filter;
@@ -25,7 +29,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebFilter("/*")
 public class AuthenticationFilter implements Filter {
 
-   String []EXCLUDED_PATH;
+   String[] EXCLUDED_PATH;
 
    @Override
    public void init(FilterConfig filterConfig) throws ServletException {
@@ -33,7 +37,7 @@ public class AuthenticationFilter implements Filter {
       try {
          EXCLUDED_PATH = initExcludedEndpoint().split(",");
 
-        // System.out.println(EXCLUDED_PATH);
+         // System.out.println(EXCLUDED_PATH);
       } catch (IOException e) {
          e.printStackTrace();
       }
@@ -46,7 +50,7 @@ public class AuthenticationFilter implements Filter {
       HttpServletResponse res = (HttpServletResponse) response;
 
       String path = req.getRequestURI().substring(req.getContextPath().length());
-      
+
       String method = req.getMethod();
 
       System.out.println("HTTP Method: " + method);
@@ -54,8 +58,7 @@ public class AuthenticationFilter implements Filter {
       System.out.println(path);
       // Exclude the /login endpoint from authentication
 
-
-      if (isExluded(path,method)) {
+      if (isExluded(path, method)) {
          filterChain.doFilter(request, response);
          return;
       }
@@ -63,6 +66,7 @@ public class AuthenticationFilter implements Filter {
       // Check for JWT token in Authorization header
       String token = extractToken(req.getHeader("Authorization"));
 
+      // System.out.println(token);
       if (!isTokenValid(token)) {
          Gson gson = new Gson();
          HashMap<String, Object> map = new HashMap<>();
@@ -88,6 +92,23 @@ public class AuthenticationFilter implements Filter {
 
    private String extractToken(String token) {
 
+      /* Algorithm algorithm = Algorithm.ECDSA256(new ECDSAKeyProvider() {
+         @Override
+         public ECPublicKey getPublicKeyById(String s) {
+            return publicKey;
+         }
+
+         @Override
+         public ECPrivateKey getPrivateKey() {
+            throw new UnsupportedOperationException();
+         }
+
+         @Override
+         public String getPrivateKeyId() {
+            throw new UnsupportedOperationException();
+         }
+      }); */
+      System.out.println(token);
       return null;
    }
 
@@ -110,11 +131,10 @@ public class AuthenticationFilter implements Filter {
 
    }
 
-
-   private boolean isExluded(String endpoint,String method){
+   private boolean isExluded(String endpoint, String method) {
       for (String string : EXCLUDED_PATH) {
-         String d = method+":"+endpoint;
-         if(string.equals(d)){
+         String d = method + ":" + endpoint;
+         if (string.equals(d)) {
             return true;
          }
       }
